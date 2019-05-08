@@ -7,42 +7,61 @@
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
 #include "menu.h"
-#define SCREEN_W 1000
-#define SCREEN_H 650
+
 int main()
 {
     scrolling scro;
     image newgame,settings,help,exit,menu,level1;
-    SDL_Surface *ecran=NULL;
-    int continuer = 1,i=0;
-    SDL_Rect camera;
-    camera.x=0;
-    camera.y=0;
-    camera.h=SCREEN_H;
-    camera.w=SCREEN_W;
+    SDL_Surface *ecran=NULL, *imageDeFond=NULL,*imageDePerso=NULL;;
+    int continuer = 1,i=0,choix=0;
+    ennemie e;
+    int mvmspeed=50;
+    int x=0;
+    int gravit=350;
+    SDL_Rect positionFond ,positionmilieu;
+    SDL_Rect position;
+    position.x=700;
+    position.y=650;
+    positionFond.x = 0;
+    positionFond.y = 0;
+    positionFond.h =1000;
+    positionFond.w =1000;
+    positionmilieu.x = 200/2 - 50 / 2;
+    positionmilieu.y = 350;
     SDL_Event event;
 
-    ecran=openwindow(ecran,SCREEN_W,SCREEN_H);
+    ecran = SDL_SetVideoMode(1000,650, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
 
     affichagecoat(ecran);
     musique_menu();
     affichagemenu(menu,ecran);
+    e=initialiser_ennemie(e);
+////////////////////////////////////////////////////////////////
+    imageDeFond = IMG_Load("stage1.png");
+    imageDePerso = IMG_Load("attachments/1.png");
+       SDL_EnableKeyRepeat(10, 10);
+    images minimap,icon;
+    minimap=init_image("maptest.png",799,0);
+    icon=init_image("icontest.png",804,60);
 
-    SDL_EnableKeyRepeat(100,100);
     while (continuer)
-    {
+    { 
+      if(choix==1)
+      {
+       e=deplacer_ennemie(e,ecran,position,positionmilieu);
+       }
         SDL_WaitEvent(&event);
         switch(event.type)
         {
         case SDL_QUIT:
             continuer = 0;
             break;
-        case SDL_MOUSEBUTTONDOWN:// nzelt ala felsa f souris
-            if (event.button.button == SDL_BUTTON_LEFT)// itha kan nzelt ysar
+        case SDL_MOUSEBUTTONDOWN:
+            if (event.button.button == SDL_BUTTON_LEFT)
             {
-
-                if ( event.button.x >21 && event.button.y >236 && event.button.x < 192 && event.button.y <276)//les cordonnee win bch tenzel b souris(cordonnee mtaa bouton play)
+                if ( event.button.x >21 && event.button.y >236 && event.button.x < 192 && event.button.y <276)
                 {
+                    choix=1;
                     soundclic();
                     bouttonplay(newgame,ecran);
                 }
@@ -67,30 +86,35 @@ int main()
             }
             break;
 
-        case SDL_KEYDOWN: 
+        case SDL_KEYDOWN:
             switch(event.key.keysym.sym)// win teta9ra l click
             {
             case SDLK_RIGHT:
-                camera.x += 20;
-                if(camera.x>4120)// fixation de la Position
-                {
-                    camera.x=4120;
-                }
-                break;
+if(choix==1)
+{
+moving_right(&positionmilieu,&positionFond,imageDeFond,ecran,imageDePerso);
+animationright(&positionmilieu,&positionFond,imageDeFond,ecran,imageDePerso);  
+icon.pos.x += 2;
+}            
+            break;
             case SDLK_LEFT:
-                camera.x -= 20;
-                if(camera.x<0) // fixation de la Position
-                {
-                    camera.x=0;
-                }
+if(choix==1)
+{
+moving_left(&positionmilieu,&positionFond,imageDeFond,ecran,imageDePerso);
+animationleft(&positionmilieu,&positionFond,imageDeFond,ecran,imageDePerso);
+icon.pos.x -= 2;
+}
                 break;
             case SDLK_RETURN: //bouton entrer
                 if (i==1)
                 {
-                    scro=init_img("stage1.png",0,0);
+                    choix=1;
+                    SDL_BlitSurface(imageDeFond,NULL, ecran, &positionFond);
+                    SDL_Flip(ecran);
                 }
                 else if (i==2)
                 {
+
                 }
                 else if (i==3)
                 {
@@ -105,6 +129,12 @@ int main()
                 break;
 
             case SDLK_DOWN:
+            if(choix==1)
+            {
+                gravit=250;
+            }
+                //if(choix!=1)
+                {
                 i++;
                 if(i==5)
                 {
@@ -131,9 +161,15 @@ int main()
                     soundclic();
                     bouttonexit(exit,ecran);
                 }
-
+                }
                 break;
             case SDLK_UP:
+                if(choix==1)
+                {
+                jump(&positionmilieu,&positionFond,imageDeFond,ecran,imageDePerso);
+                }
+                if(choix!=1)
+                {
                 i--;
                 if(i<=0)
 
@@ -161,18 +197,25 @@ int main()
                     bouttonexit(exit,ecran);
                 }
 
-
+                }
                 break;
             }
         }
-        Scroll(ecran,scro,camera);
+      
+        gravity(&positionmilieu,&positionFond,imageDeFond,ecran,imageDePerso,gravit); 
+        if(choix==1)
+        {
+        affichage(ecran,minimap); 
+        affichage(ecran,icon); 
+        }
+        SDL_Flip(ecran);
+ 
+        
     }
-
+    librer_image(minimap);
+    librer_image(icon);
     Mix_CloseAudio();//tsakr e sout
     SDL_Quit(); // Arrêt de la SDL
-
-
-
     return EXIT_SUCCESS; // Fermeture du programme
 }
 

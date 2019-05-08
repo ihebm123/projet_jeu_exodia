@@ -21,6 +21,30 @@ typedef struct
 	SDL_Rect positiond;// Position mta3 background
 }scrolling;
 
+typedef struct image
+{
+	SDL_Surface *img;//wyn chnachargo image
+	SDL_Rect pos;// Position mta3 background
+}images;
+
+typedef struct ennemie
+{
+
+
+int direction;
+SDL_Rect pos;
+SDL_Surface *tab[4],*tab2[2];
+int etat;
+int etat2,etat3;
+int p1,p2;
+}ennemie;
+
+images init_image(char nameofpicture[100],int x,int y);
+void affichage(SDL_Surface *ecran,images img);
+void librer_image(images img);
+
+ennemie initialiser_ennemie(ennemie e);
+ennemie deplacer_ennemie( ennemie e ,SDL_Surface *ecran, SDL_Rect pos,SDL_Rect positionperso);
 
 SDL_Surface* openwindow(SDL_Surface *ecran,int h,int w);
 
@@ -41,5 +65,12 @@ void bouttonsettings(image settings,SDL_Surface *ecran);
 void bouttonhelp(image help,SDL_Surface *ecran);
 void bouttonexit(image exit,SDL_Surface *ecran);
 void play(image level1,SDL_Surface *ecran,SDL_Rect camera);
+
+void moving_right(SDL_Rect *positionmilieu,SDL_Rect *positionFond,SDL_Surface *imageDeFond,SDL_Surface * ecran,SDL_Surface *imageDePerso);
+void moving_left(SDL_Rect *positionmilieu,SDL_Rect *positionFond,SDL_Surface *imageDeFond , SDL_Surface *ecran,SDL_Surface *imageDePerso);
+void gravity(SDL_Rect *positionmilieu,SDL_Rect *positionFond,SDL_Surface *imageDeFond , SDL_Surface *ecran,SDL_Surface *imageDePerso,int gravity);
+void animationright(SDL_Rect *positionmilieu,SDL_Rect *positionFond,SDL_Surface *imageDeFond , SDL_Surface *ecran,SDL_Surface *imageDePerso);
+void animationleft(SDL_Rect *positionmilieu,SDL_Rect *positionFond,SDL_Surface *imageDeFond , SDL_Surface *ecran,SDL_Surface *imageDePerso);
+void jumpjump(SDL_Rect *positionmilieu,SDL_Rect *positionFond,SDL_Surface *imageDeFond , SDL_Surface *ecran,SDL_Surface *imageDePerso);
 
 #endif
